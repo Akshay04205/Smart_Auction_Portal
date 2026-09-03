@@ -1,29 +1,14 @@
 # Auction Portal
 
-A working Django + SQLite auction website: buyers register, browse active
-auctions, place competitive bids, and win auctions when the timer runs out.
-Auctions any kind of item (not tied to any one industry). Built with Django
-templates + vanilla HTML/CSS/JS (no frontend framework).
+**Auction Portal** — a working, end-to-end auction website where sellers list
+items and buyers compete in live, timed bidding. Every bid is validated and
+stored server-side (never trusting the browser), auctions close
+automatically and pick a winner the moment their timer runs out, and the
+whole thing runs on Django + SQLite with a hand-built admin panel — no
+React, no paid services, just Python and templates.
 
-## 1. Setup
 
-```bash
-# Create and activate a virtual environment
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Apply migrations (this creates db.sqlite3 automatically - no separate
-# database server or credentials needed)
-python manage.py migrate
-
-# Create your own admin account
-python manage.py createsuperuser
-```
-
-## 2. (Optional) Load demo data
+## 1. (Optional) Load demo data
 
 A ready-made fixture with a sample item, an active auction, and two buyer
 accounts is included:
@@ -42,7 +27,7 @@ it was generated. If it's already in the past by the time you load it, open
 it in `/admin/` and push `end_time` into the future, or just create a fresh
 auction yourself (see step 4).
 
-## 3. Run it
+## 2. Run it
 
 ```bash
 python manage.py runserver
@@ -50,14 +35,14 @@ python manage.py runserver
 
 Visit `http://127.0.0.1:8000/`. Admin site is at `http://127.0.0.1:8000/admin/`.
 
-## 4. Create your own item + auction (if not using the fixture)
+## 3. Create your own item + auction (if not using the fixture)
 
 In `/admin/`:
 1. **Auctions → Items → Add** - name, description, quantity, unit.
 2. **Auctions → Auctions → Add** - pick the item, set starting price,
    minimum increment, start time, end time, and status `ACTIVE`.
 
-## 5. Keep auctions closing on time (recommended for production)
+## 4. Keep auctions closing on time (recommended for production)
 
 The site auto-closes any expired ACTIVE auction whenever *any* page is
 loaded, so it self-heals even without a scheduler. For auctions to close
