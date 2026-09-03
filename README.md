@@ -1,154 +1,194 @@
-# Auction Portal
+# Auctra — Intelligent Forward Auction Platform
 
-**Auction Portal** — a working, end-to-end auction website where sellers list
-items and buyers compete in live, timed bidding. Every bid is validated and
-stored server-side (never trusting the browser), auctions close
-automatically and pick a winner the moment their timer runs out, and the
-whole thing runs on Django + SQLite with a hand-built admin panel — no
-React, no paid services, just Python and templates.
+A web-based forward auction platform built with Django that allows users to register, create and participate in auctions, place competitive bids, monitor auction activity in real time, and track auction results. The platform provides a secure and user-friendly environment for managing auction listings, evaluating bids, and connecting buyers with sellers through a transparent bidding process.
 
+---
 
-## 1. (Optional) Load demo data
+## Table of Contents
 
-A ready-made fixture with a sample item, an active auction, and two buyer
-accounts is included:
+- [Overview](#overview)
+- [Key Features](#key-features)
+  - [User Authentication](#user-authentication)
+  - [Auction Management](#auction-management)
+  - [Bidding](#bidding)
+  - [Auction Results](#auction-results)
+  - [Administration](#administration)
+- [How It Works](#how-it-works)
+- [System Structure](#system-structure)
+- [Database](#database)
+- [Technology Stack](#technology-stack)
+- [Project Status](#project-status)
+- [License](#license)
 
-```bash
-python manage.py loaddata auctions/fixtures/demo_data.json
+---
+
+## Overview
+
+**Auctra** is a Django-based web application designed to provide a simple online auction experience.
+
+The platform follows a **forward auction model**, where multiple users compete by increasing their bids. The highest valid bid becomes the leading bid and can become the winner when the auction closes.
+
+The project includes user authentication, auction management, bidding functionality, highest-bid tracking, auction results, and a Django administration panel.
+
+---
+
+## Key Features
+
+### User Authentication
+
+- User registration
+- User login and logout
+- Django-based authentication
+- Separate administrator access
+
+### Auction Management
+
+- Create and manage auctions
+- Starting price
+- Minimum bid increment
+- Auction start and end time
+- Auction status management
+- Active auction dashboard
+
+### Bidding
+
+- Users can participate in active auctions
+- Competitive forward bidding
+- Individual bids stored in the database
+- Current highest bid tracking
+- Bidder and auction relationships
+
+### Auction Results
+
+- Winning bidder tracking
+- Winning bid tracking
+- Final winning price
+- Auction closing information
+
+### Administration
+
+The Django Admin panel provides management of:
+
+- Users
+- Auction items
+- Auctions
+- Bids
+- Auction results
+
+---
+
+## How It Works
+
+```text
+User Registration
+        ↓
+      Login
+        ↓
+Auction Dashboard
+        ↓
+Select Active Auction
+        ↓
+View Auction Details
+        ↓
+    Place Bid
+        ↓
+Highest Bid Updated
+        ↓
+   Auction Closes
+        ↓
+ Winner Recorded
 ```
 
-This creates:
-- **Item:** Sample Auction Item, 1 unit
-- **Auction:** starting price ₹1,000, minimum increment ₹50, status ACTIVE
-- **Users:** `admin` / `adminpass123` (superuser), `buyer1` / `BuyerPass123!`, `buyer2` / `BuyerPass123!`
+Auctra uses a **forward auction**, meaning the price moves upward as users compete.
 
-Note: the auction's `end_time` in the fixture is a fixed timestamp set when
-it was generated. If it's already in the past by the time you load it, open
-it in `/admin/` and push `end_time` into the future, or just create a fresh
-auction yourself (see step 4).
+Example:
 
-## 2. Run it
+```text
+Starting Price: ₹10,000
 
-```bash
-python manage.py runserver
+Bid 1 → ₹10,500
+Bid 2 → ₹11,000
+Bid 3 → ₹12,000
+Bid 4 → ₹12,500
+
+Winning Bid → ₹12,500
 ```
 
-Visit `http://127.0.0.1:8000/`. Admin site is at `http://127.0.0.1:8000/admin/`.
+---
 
-## 3. Create your own item + auction (if not using the fixture)
+## System Structure
 
-In `/admin/`:
-1. **Auctions → Items → Add** - name, description, quantity, unit.
-2. **Auctions → Auctions → Add** - pick the item, set starting price,
-   minimum increment, start time, end time, and status `ACTIVE`.
-
-## 4. Keep auctions closing on time (recommended for production)
-
-The site auto-closes any expired ACTIVE auction whenever *any* page is
-loaded, so it self-heals even without a scheduler. For auctions to close
-exactly on time with zero site traffic, also schedule this every minute:
-
-```bash
-python manage.py close_expired_auctions
+```text
+Auctra/
+│
+├── auction_project/
+│   └── Django project configuration
+│
+├── auctions/
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   └── templates/
+│
+├── bids/
+│   ├── models.py
+│   ├── views.py
+│   └── urls.py
+│
+├── accounts/
+│   └── Authentication and registration
+│
+├── static/
+│   └── auction/
+│       ├── css/
+│       └── js/
+│
+├── db.sqlite3
+└── manage.py
 ```
 
-Linux/Mac cron example:
-```
-* * * * * cd /path/to/project && /path/to/venv/bin/python manage.py close_expired_auctions
-```
+---
 
-## Project structure
+## Database
 
-```
-steel_auction/        Django project settings, root urls.py
-                       (internal package name only - not user-facing)
-accounts/              registration, login/logout wiring, my-wins
-  forms.py             BuyerRegistrationForm (UserCreationForm + email)
-  views.py, urls.py
-auctions/              Item + Auction models, home/list/detail views
-  models.py
-  admin.py             Item & Auction admin (searchable/filterable, inline bids)
-  management/commands/close_expired_auctions.py
-  fixtures/demo_data.json
-bids/                  Bid + AuctionResult models, bidding & closing logic
-  models.py
-  services.py          place_bid(), close_expired_auctions() - single source of truth
-  views.py, urls.py
-  admin.py             read-only Bid & AuctionResult admin
-templates/             base.html + all pages + registration/
-static/css/style.css   dark theme, "digital scale" price readout
-static/js/countdown.js live countdown timer (cosmetic only)
-scripts/e2e_check.py   optional dev smoke test (see below)
-```
+The application uses **SQLite** as its database.
 
-**Note on the `steel_auction/` folder name:** this is the internal Django
-project package (settings, WSGI, URL root) - it's a technical name only,
-never shown to site visitors, and renaming it would require updating any
-hosting provider's WSGI configuration that already points at it. Everything
-user-facing has been renamed to "Auction Portal."
+The main models are:
 
-## How the auction workflow works
+- **Scrap** — currently used as the auction item model
+- **Auction** — stores auction information and status
+- **Bid** — stores bids placed by users
+- **AuctionResult** — stores the final auction outcome
+- **User** — Django's built-in authentication model
 
-1. **Admin** creates an `Item`, then an `Auction` for it with a starting
-   price, minimum increment, and a start/end time window. Setting status to
-   `ACTIVE` makes it visible and biddable on the public site.
-2. **Buyers** register at `/accounts/register/` (auto-logs them in) or log
-   in at `/accounts/login/`.
-3. On `/auctions/` or an auction's detail page (`/auction/<id>/`), a logged-in
-   buyer sees the current highest bid and the minimum amount they're allowed
-   to bid next (`starting_price` if no bids yet, else `highest_bid + minimum_increment`).
-4. Submitting the bid form **POST**s to `/auction/<id>/bid/`. The view
-   (`bids/views.py`) never trusts the browser - it hands the raw amount to
-   `bids/services.py::place_bid()`, which re-checks: is the auction ACTIVE,
-   is `now` between `start_time` and `end_time`, and is the amount high
-   enough (and no more than 10 digits) - all against the database, inside a
-   row-locked transaction so two buyers bidding the same instant can't both
-   "win" the same bid.
-5. Every accepted bid is stored as its own `Bid` row - nothing is ever
-   overwritten, so the full history is always available (newest first).
-6. The countdown timer on the page is pure JavaScript for display only.
-   Security-wise it's irrelevant: the backend re-validates `end_time`
-   independently on every single bid submission.
-7. Once `end_time` passes, the **next** page load (by anyone) or the
-   `close_expired_auctions` management command calls
-   `bids/services.py::close_expired_auctions()`, which locks the auction,
-   picks the bid with the highest amount as the winner, and creates a single
-   `AuctionResult` row (winner, winning bid, winning price, closed_at). If
-   nobody bid, the auction still closes but the result has no winner.
-8. The winning buyer sees the auction under **My Won Auctions**
-   (`/my-wins/`).
+The auction and bidding models are connected using Django model relationships.
 
-## What was verified before handoff
+---
 
-The core bidding/closing workflow was tested end-to-end using Django's test
-client (registration → login → viewing auctions → placing valid bids →
-rejecting an invalid low bid → bid history ordering → auction auto-closing
-at end_time → winner selection → winning price lock → AuctionResult
-creation → rejecting bids after close → the winner seeing the auction in
-"My Won Auctions" → admin viewing auctions and bids). All 26 checks passed.
-The `Scrap` → `Item` rename migration (`auctions/migrations/0003_rename_scrap_to_item.py`)
-was additionally tested by applying it to a **real copy of live data**
-(existing items, auctions, and users) to confirm nothing is lost - only
-names change, not data. The script is included at `scripts/e2e_check.py` if
-you want to rerun it yourself (it deletes and recreates its own test data -
-safe to run against a dev database, not recommended against real data).
+## Technology Stack
 
-## Redeploying this update (e.g. to PythonAnywhere)
+| Technology   | Purpose               |
+| ------------ | --------------------- |
+| Python       | Backend               |
+| Django       | Web framework         |
+| SQLite       | Database              |
+| HTML         | Frontend              |
+| CSS          | Styling               |
+| JavaScript   | Frontend interactions |
+| Django Admin | Administration        |
 
-If you already have this site running on a host, update it with:
+---
 
-```bash
-python manage.py migrate                 # applies the Scrap -> Item rename
-python manage.py collectstatic --clear   # refreshes static files (see below)
-```
-Then reload your web app from the hosting provider's dashboard.
+## Project Status
 
-## Note: uses SQLite, and STATIC_ROOT is now set
+**Working Prototype**
 
-This project uses SQLite (`db.sqlite3`, created automatically by `migrate`,
-listed in `.gitignore`). `STATIC_ROOT` is now set in `settings.py`, which
-was missing before - that omission was the cause of unstyled/overlapping
-admin pages on real hosting (`runserver` on your own machine doesn't need
-it, which is why it worked locally without it). After deploying, always run
-`python manage.py collectstatic` and reload the web app for CSS/JS to load
-correctly.
+Auctra currently provides the core functionality of an online forward auction portal, including authentication, auction management, bidding, highest-bid tracking, auction results, and administrative management.
+
+The project is structured so that additional functionality can be added in future versions.
+
+---
+
+## License
+
+This project is developed for learning and demonstration purposes.
