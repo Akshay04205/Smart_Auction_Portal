@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Auctions - Auction Portal{% endblock %}
+
+{% block content %}
+<h1>All Auctions</h1>
+
+{% if auctions %}
+  <div class="auction-grid">
+    {% for auction in auctions %}
+      {% include 'partials/auction_card.html' %}
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="empty-state">No active auctions available.</p>
+{% endif %}
+{% endblock %}

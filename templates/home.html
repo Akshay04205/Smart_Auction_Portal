@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Auction Portal{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1>Auction Portal</h1>
+  <p>Buy anything through transparent competitive auctions.</p>
+  <a href="{% url 'auction_list' %}" class="btn btn-primary btn-large">View Active Auctions</a>
+</section>
+
+<section>
+  <h2>Active Auctions</h2>
+  {% if active_auctions %}
+    <div class="auction-grid">
+      {% for auction in active_auctions %}
+        {% include 'partials/auction_card.html' %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="empty-state">No active auctions right now.</p>
+  {% endif %}
+</section>
+{% endblock %}

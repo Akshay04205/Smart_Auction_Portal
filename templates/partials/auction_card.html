@@ -1,0 +1,18 @@
+<div class="auction-card">
+  <div class="auction-card-header">
+    <h3>{{ auction.item.name }}</h3>
+    <span class="badge badge-{{ auction.status|lower }}">{{ auction.get_status_display }}</span>
+  </div>
+  <p class="auction-desc">{{ auction.item.description|default:"No description provided."|truncatewords:20 }}</p>
+  <ul class="auction-meta">
+    <li><strong>Quantity:</strong> {{ auction.item.quantity }} {{ auction.item.unit }}</li>
+    <li><strong>Starting Price:</strong> &#8377;{{ auction.starting_price }}</li>
+    <li><strong>Current Highest Bid:</strong> &#8377;{{ auction.current_price }}</li>
+    <li><strong>Minimum Next Bid:</strong> &#8377;{{ auction.minimum_next_bid }}</li>
+    <li><strong>Ends:</strong> {{ auction.end_time|date:"M d, Y g:i A" }}</li>
+  </ul>
+  {% if auction.status == 'ACTIVE' %}
+    <div class="countdown" data-end="{{ auction.end_time|date:'c' }}">--:--:--</div>
+  {% endif %}
+  <a href="{% url 'auction_detail' auction.id %}" class="btn btn-primary">View Auction</a>
+</div>

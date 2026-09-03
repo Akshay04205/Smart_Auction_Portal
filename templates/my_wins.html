@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}My Won Auctions - Auction Portal{% endblock %}
+
+{% block content %}
+<h1>My Won Auctions</h1>
+
+{% if results %}
+  <table class="bid-table">
+    <thead>
+      <tr><th>Item</th><th>Winning Price</th><th>Closed At</th><th>Result</th></tr>
+    </thead>
+    <tbody>
+      {% for result in results %}
+        <tr>
+          <td><a href="{% url 'auction_detail' result.auction.id %}">{{ result.auction.item.name }}</a></td>
+          <td>&#8377;{{ result.winning_price }}</td>
+          <td>{{ result.closed_at|date:"M d, Y g:i A" }}</td>
+          <td><span class="badge badge-won">Won</span></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p class="empty-state">You haven't won any auctions yet.</p>
+{% endif %}
+{% endblock %}

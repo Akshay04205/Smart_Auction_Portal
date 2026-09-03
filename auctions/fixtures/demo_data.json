@@ -1,0 +1,80 @@
+[
+{
+  "model": "auth.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$b7eWq7xUkcIROLrsYAgBSy$XGCbl3d7eBpNYKhizJM2s+FJOaIuVlHJrTdD3UDjERk=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin@example.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-08-24T11:12:56.011Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$dtqKi2jjiN5ebye350X9QZ$cPTLczzwb8ct+CTvKu0nwr5zgKVgi9D8kLL/oOQo7q0=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "buyer1",
+    "first_name": "",
+    "last_name": "",
+    "email": "buyer1@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-25T05:09:59.739Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$cUKTAztzmvdnjRFmOKaGoI$8YdksaqlAieDXLprTkhPJEkXGYRsTSkqjXANPVejKHQ=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "buyer2",
+    "first_name": "",
+    "last_name": "",
+    "email": "buyer2@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-25T05:10:00.171Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auctions.item",
+  "pk": 1,
+  "fields": {
+    "name": "Sample Auction Item",
+    "description": "Example item lot for testing - edit or delete this from /admin/.",
+    "quantity": "1.00",
+    "unit": "units",
+    "created_at": "2026-08-25T05:09:59.733Z"
+  }
+},
+{
+  "model": "auctions.auction",
+  "pk": 1,
+  "fields": {
+    "item": 1,
+    "starting_price": "1000.00",
+    "minimum_increment": "50.00",
+    "start_time": "2026-08-25T04:59:59.734Z",
+    "end_time": "2026-08-27T05:09:59.734Z",
+    "status": "ACTIVE",
+    "created_at": "2026-08-25T05:09:59.736Z"
+  }
+}
+]

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}{{ auction.item.name }} - Auction Portal{% endblock %}
+
+{% block content %}
+<div class="detail-grid">
+
+  <div class="detail-main">
+    <span class="badge badge-{{ auction.status|lower }}">{{ auction.get_status_display }}</span>
+    <h1>{{ auction.item.name }}</h1>
+    <p>{{ auction.item.description|default:"No description provided." }}</p>
+
+    <table class="info-table">
+      <tr><th>Quantity</th><td>{{ auction.item.quantity }} {{ auction.item.unit }}</td></tr>
+      <tr><th>Starting Price</th><td>&#8377;{{ auction.starting_price }}</td></tr>
+      <tr><th>Minimum Increment</th><td>&#8377;{{ auction.minimum_increment }}</td></tr>
+      <tr><th>Minimum Next Bid</th><td>&#8377;{{ minimum_next_bid }}</td></tr>
+      <tr><th>Start Time</th><td>{{ auction.start_time|date:"M d, Y g:i A" }}</td></tr>
+      <tr><th>End Time</th><td>{{ auction.end_time|date:"M d, Y g:i A" }}</td></tr>
+    </table>
+
+    {% if auction.status == 'ACTIVE' %}
+      <div class="countdown-box">
+        <span class="countdown-label">Time Remaining</span>
+        <div class="countdown countdown-large" data-end="{{ auction.end_time|date:'c' }}">--:--:--</div>
+      </div>
+    {% endif %}
+
+    <h2>Bid History</h2>
+    {% if bid_history %}
+      <table class="bid-table">
+        <thead>
+          <tr><th>Bidder</th><th>Bid Amount</th><th>Date / Time</th></tr>
+        </thead>
+        <tbody>
+          {% for bid in bid_history %}
+            <tr>
+              <td>{{ bid.bidder.username }}</td>
+              <td>&#8377;{{ bid.amount }}</td>
+              <td>{{ bid.created_at|date:"M d, Y g:i A" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="empty-state">No bidding history yet. Be the first to bid.</p>
+    {% endif %}
+  </div>
+
+  <aside class="detail-side">
+    <div class="price-box">
+      <span class="price-label">Current Highest Bid</span>
+      <span class="price-value">&#8377;{{ auction.current_price }}</span>
+      {% if highest_bid %}
+        <span class="price-sub">Highest Bidder: {{ highest_bid.bidder.username }}</span>
+      {% else %}
+        <span class="price-sub">No bids yet</span>
+      {% endif %}
+    </div>
+
+    {% if auction.status == 'ACTIVE' %}
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'place_bid' auction.id %}" class="bid-form" id="bid-form">
+          {% csrf_token %}
+          <label for="amount">Enter Your Bid (minimum &#8377;{{ minimum_next_bid }}, max 10 digits)</label>
+          <input type="number" step="0.01" min="{{ minimum_next_bid }}" maxlength="10" name="amount" id="amount" required>
+          <button type="submit" class="btn btn-primary btn-large">Place Bid</button>
+        </form>
+      {% else %}
+        <p>Login to participate in this auction.</p>
+        <a href="{% url 'login' %}?next={% url 'auction_detail' auction.id %}" class="btn btn-primary btn-large">Login to Bid</a>
+      {% endif %}
+    {% elif auction.status == 'CLOSED' %}
+      <p class="closed-note">
+        This auction is closed.
+        {% if auction.result.winner %}
+          Won by <strong>{{ auction.result.winner.username }}</strong> at &#8377;{{ auction.result.winning_price }}.
+        {% else %}
+          No bids were placed - there is no winner.
+        {% endif %}
+      </p>
+    {% else %}
+      <p class="closed-note">This auction has not started yet. Check back at {{ auction.start_time|date:"M d, Y g:i A" }}.</p>
+    {% endif %}
+  </aside>
+
+</div>
+{% endblock %}
